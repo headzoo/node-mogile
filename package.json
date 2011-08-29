@@ -1,1 +1,1 @@
-{  	"name" : "node-mogile",    "version" : "0.1.1",    "description" : "MogileFS client library",    "author": "headzoo <headz@motherless.com>",    "main": "./index.js",    "repository": {        "type": "git",        "url": "git://github.com/headzoo/node-mogile.git"    }}
+{  	"name" : "mogile",    "version" : "0.1.2",    "description" : "MogileFS client library",    "author": "headzoo <headz@motherless.com>",    "main": "./index.js",    "repository": {        "type": "git",        "url": "git://github.com/headzoo/node-mogile.git"    }}

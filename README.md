@@ -1,4 +1,4 @@
-node-mogile - A MogileFS client for node.js
+mogile - A MogileFS client for node.js
 ===========================================
 
 This is a simple MogileFS client for node.js. This is my first real project using
@@ -7,7 +7,7 @@ serve my needs, and it does.
 
 ## Installation
 
-	npm install node-mogile
+	npm install mogile
 
 ## Usage
 
