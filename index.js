@@ -29,7 +29,7 @@ var Mogile = function(trackers, retries)
  * @param {Number} retries Number of times to retry an operation
  * @return {Mogile}
  */
-Mogile.factory = function(trackers, retries)
+Mogile.createClient = function(trackers, retries)
 {
 	return new Mogile(trackers, retries);
 }
@@ -41,7 +41,7 @@ Mogile.factory = function(trackers, retries)
  *
  * @return {Domain}
  */
-Mogile.prototype.domain = function(name)
+Mogile.domain = Mogile.prototype.domain = function(name)
 {
 	return domain.factory(this, name);
 }
@@ -127,7 +127,7 @@ Mogile.prototype.send = function(domain, cmd, args, callback)
 				return callback(parts[1]);
 			}
 			
-			return callback(null, querystring.parse(parts[1]));
+			return callback(null, querystring.parse(parts[1].replace("\r\n", "")));
 		});
 	}
 	
