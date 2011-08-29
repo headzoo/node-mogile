@@ -1,5 +1,5 @@
-var	domain = require('./domain'),
-	tracker = require('./tracker'),
+var	domain = require('./lib/domain'),
+	tracker = require('./lib/tracker'),
 	querystring = require('querystring'),
 	net = require('net');
 
