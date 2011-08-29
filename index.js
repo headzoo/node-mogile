@@ -1,7 +1,10 @@
 var	domain = require('./lib/domain'),
 	tracker = require('./lib/tracker'),
+	utils = require('./lib/utils'),
 	querystring = require('querystring'),
-	net = require('net');
+	net = require('net'),
+	fs = require('fs'),
+	noop = function() {};
 
 /**
  * Constructor
@@ -11,12 +14,28 @@ var	domain = require('./lib/domain'),
  */
 var Mogile = function(trackers, retries)
 {
+	// A log of all commands that took place during a transaction
+	this.transaction_log = [];
+	
+	// Whether we're inside of a transaction or not
+	this.is_transaction = false;
+	
+	// List of local files that need to be deleted at the end of of the transaction
+	this.transaction_files = [];
+	
+	// The tracker hosts
 	this.trackers = [];
 	for(var i = 0; i < trackers.length; i++) {
 		this.trackers.push(new tracker.factory(trackers[i]));
 	}
+	
+	// The current tracker being used
 	this.current_tracker = null;
+	
+	// The number of times to retry an operation
 	this.retries = (typeof retries != 'undefined') ? retries : 1;
+	
+	// The default encoding for connections
 	this.encoding = 'ascii';
 }
 
@@ -47,6 +66,102 @@ Mogile.domain = Mogile.prototype.domain = function(name)
 }
 
 /**
+ * Begins a mogile transaction
+ */
+Mogile.prototype.begin = function()
+{
+	if (this.is_transaction) {
+		return false;
+	}
+	
+	this.commit();
+	this.is_transaction = true;
+	return true;
+}
+
+/**
+ * Commits all the changes in a transaction
+ */
+Mogile.prototype.commit = function()
+{
+	this.transactionCleanFiles();
+	this.is_transaction = false;
+	this.transaction_log = [];
+	this.transaction_files = [];
+	return true;
+}
+
+/**
+ * Rolls back all the changes made during a transaction
+ */
+Mogile.prototype.rollback = function(callback)
+{
+	callback = callback || noop;
+	
+	// We have to stop the transaction now, or else subsequent calls
+	// to send() will keep recording transaction logs.
+	this.is_transaction = false;
+	var logs = this.transaction_log.reverse();
+	var action = null;
+	var i = -1;
+	var $this = this;
+	
+	var rollbackAction = function() {
+		if (++i >= logs.length) {
+			$this.commit();
+			return callback();
+		}
+		
+		action = logs[i];
+		switch(action.cmd) {
+			case 'DELETE':
+					$this.domain(action.domain)
+						.storeFile(action.args.key, action.args.class, action.args.temp_file, function(err, bytes) {
+							if (err) {
+								return callback(err);
+							}
+							return rollbackAction();
+						});
+				break;
+			case 'RENAME':
+					$this.domain(action.domain)
+						.rename(action.args.to_key, action.args.from_key, function(err) {
+							if (err) {
+								return callback(err);
+							}
+							return rollbackAction();
+						});
+				break;
+			case 'CREATE_CLOSE':
+					$this.domain(action.domain)
+						.del(action.args.key, action.args.class, function(err) {
+							if (err) {
+								return callback(err);
+							}
+							return rollbackAction();
+						});
+				break;
+			default:
+				// Not all commands have changes to make
+				return rollbackAction();
+				break;
+		}
+	};
+	
+	return rollbackAction();
+}
+
+/**
+ * Deletes an temp files that were created during a transaction
+ */
+Mogile.prototype.transactionCleanFiles = function()
+{
+	for(var i = 0; i < this.transaction_files; i++) {
+		fs.unlink(this.transaction_files[i]);
+	}
+}
+
+/**
  * Gets a list of all the domains in the file system
  *
  * @param {Function} callback Function to call with an array of all domains
@@ -54,7 +169,7 @@ Mogile.domain = Mogile.prototype.domain = function(name)
  */
 Mogile.prototype.getDomains = function(callback)
 {
-	callback = callback || function() {};
+	callback = callback || noop;
 	
 	this.send('default', 'GET_DOMAINS', {}, function(err, results) {
 		if (err) {
@@ -92,18 +207,16 @@ Mogile.prototype.getDomains = function(callback)
 Mogile.prototype.send = function(domain, cmd, args, callback)
 {
 	args = args || {};
-	callback = callback || function() {};
-	
-	args['domain'] = domain;
+	callback = callback || noop;
+	args.domain = domain;
 	var command = cmd + ' ' + querystring.stringify(args) + "\n";
 	var tries = 0;
 	var $this = this;
-	console.log('mogile, sending command: ' + command);
+	
 	var sendf = function() {
 		$this.sendCommand(command, function(err, results) {
 			if (err) {
-				tries++;
-				if (tries > $this.retries) {
+				if (++tries > $this.retries) {
 					// Mark the tracker dead
 					return callback(err);
 				} else {
@@ -131,7 +244,37 @@ Mogile.prototype.send = function(domain, cmd, args, callback)
 		});
 	}
 	
-	sendf();
+	if (this.is_transaction) {
+		if (cmd == 'DELETE') {
+			// When deleting, we need to store a temp copy of the file. That way
+			// we can re-store the file if the transaction is rolled back. That's
+			// why we *need* a storage class for the delete command when inside
+			// transactions... There's no way to re-store the file without the name
+			// of the storage class.
+			if (typeof args.class == 'undefined') {
+				return callback("A class name must be specified when deleting within a transaction");
+			}
+			args.temp_file = utils.tempnam('/tmp', 'mogile');
+			if (!args.temp_file) {
+				return callback('Unable to create temp file in /tmp');
+			}
+			$this.domain(args.domain)
+				.getFile(args.key, args.temp_file, function(err, bytes) {
+					if (err) {
+						return callback(err);
+					}
+					$this.transaction_files.push(args.temp_file);
+					$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
+					sendf();
+				});
+		} else {
+			$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
+			sendf();
+		}
+	} else {
+		sendf();
+	}
+
 	return true;
 }
 
