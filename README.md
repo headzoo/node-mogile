@@ -5,16 +5,31 @@ This is a simple MogileFS client for node.js. This is our first real project usi
 node.js, so it may be buggy, inefficient, and just plain useless. It was written to
 serve our needs, and it does.
 
+Install with:
+
+	npm install node-mogile
+
 ## Usage
 
 	var mogile = require('mogile');
 	
-	// Create an array of trackers to communicate with
+	// The createClient method takes an array of trackers
 	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
-	var mog = mogile.factory(trackers);
 	
-	// Most commands use the domain object
-	var domain = mog.domain('default');
+	// Create a new mogile client
+	var client = mogile.createClient(trackers);
+	
+	// Get all the domains
+	client.getDomains(function(err, domains) {
+		if (err) {
+			console.log('ERROR: ' + err);
+			return;
+		}
+		console.log(domains);
+	});
+	
+	// All of the commands that work within a domain use a Domain object
+	var domain = client.domain('default');
 	
 	// Get all the paths for a given file
 	domain.getPaths('my_file.txt', 0, function(err, paths) {
@@ -51,3 +66,18 @@ serve our needs, and it does.
 		console.log('Wrote ' + bytes_written + ' bytes');
 	});
 	
+	// Deleting a file
+	domain.del('my_file.txt', function(err) {
+		if (err) {
+			console.log('ERROR: ' + err);
+			return;
+		}
+	});
+	
+	// Renaming a file
+	domain.rename('my_file.txt', 'your_file.txt', function(err) {
+		if (err) {
+			console.log('ERROR: ' + err);
+			return;
+		}
+	});
