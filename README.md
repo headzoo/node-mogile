@@ -1,11 +1,11 @@
-node-mogile - a node.js MogileFS client
-===========================
+node-mogile - A MogileFS client for node.js
+===========================================
 
-This is a simple MogileFS client for node.js. This is our first real project using
+This is a simple MogileFS client for node.js. This is my first real project using
 node.js, so it may be buggy, inefficient, and just plain useless. It was written to
-serve our needs, and it does.
+serve my needs, and it does.
 
-Install with:
+## Installation
 
 	npm install node-mogile
 
@@ -81,3 +81,22 @@ Install with:
 			return;
 		}
 	});
+
+	
+## TODO
+
+* Try to use [sendfile](http://linux.die.net/man/2/sendfile) for getFile and storeFile
+* Add transaction support
+
+
+## License
+
+(The MIT License)
+
+Copyright (c) 2011 Sean Hickey <headz@motherless.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
