@@ -1,7 +1,7 @@
-var domain = require('./domain');
-var tracker = require('./tracker');
-var querystring = require('querystring');
-var net = require('net');
+var	domain = require('./domain'),
+	tracker = require('./tracker'),
+	querystring = require('querystring'),
+	net = require('net');
 
 /**
  * Constructor
