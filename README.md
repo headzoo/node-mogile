@@ -82,11 +82,44 @@ serve my needs, and it does.
 		}
 	});
 
+## Using Transactions
+
+	var mogile = require('mogile');
+	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
+	var client = mogile.createClient(trackers);
+	
+	client.begin(); // Start the transaction
+	
+	var domain = client.domain('default');
+	domain.storeFile('my_file.txt', 'default', '/tmp/my_file.txt', function(err, bytes_written) {
+		if (err) {
+			console.log('ERROR: ' + err);
+			return;
+		}
+		console.log('Wrote ' + bytes_written + ' bytes');
+	});
+	
+	domain.rename('my_file.txt', 'your_file.txt', function(err) {
+		if (err) {
+			console.log('ERROR: ' + err);
+			client.rollback(); // Rollback the changes
+			return;
+		}
+	});
+	
+	domain.del('your_file.txt', 'default', function(err) {
+		if (err) {
+			console.log('ERROR: ' + err);
+			client.rollback(); // Rollback the changes
+			return;
+		}
+	});
+	
+	client.commit(); // Commit the changes
 	
 ## TODO
 
 * Try to use [sendfile](http://linux.die.net/man/2/sendfile) for getFile and storeFile
-* Add transaction support
 
 
 ## License
