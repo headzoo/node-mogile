@@ -10,7 +10,11 @@ module.exports = testCase({
 	},
 	testGetDomains: function(test) {
 		this.client.getDomains(function(e, domains) {
-			test.ok(domains.length > 0);
+            if (e){
+                test.ok(false);
+            }else {
+                test.ok(domains.length > 0);
+            }
 			test.done();
 		});
 	},
@@ -74,12 +78,24 @@ module.exports = testCase({
 		});
 	},
     testStoreData: function(test){
-        this.domain.storeData('adfghjkl;z\'','level1','hhhhhhhh把这个东西存到mogilefs中去', function(err, bytes_written) {
+        this.domain.storeDataToMogile('adfghjklz;\'','level1','hhhhhhhh把这个东西存到mogilefs中去', function(err, bytes_written) {
             if (err) {
                 console.log(err);
                 test.ok(false);
             } else {
                 test.ok(bytes_written > 0);
+            }
+            test.done();
+        });
+    }
+    ,
+    testGetData: function(test) {
+        this.domain.getDataFromMogile('adfghjklz;\'',  function(err, msg) {
+            if (err) {
+                test.ok(false);
+            } else {
+                console.log(msg);
+                test.ok(msg.length > 0);
             }
             test.done();
         });
