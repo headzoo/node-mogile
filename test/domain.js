@@ -78,7 +78,7 @@ module.exports = testCase({
 		});
 	},
     testStoreData: function(test){
-        this.domain.storeDataToMogile('adfghjklz;\'','level1','hhhhhhhh把这个东西存到mogilefs中去', function(err, bytes_written) {
+        this.domain.storeDataToMogile('adfghjklz;\'','level1','hhhhhhhh把这个东西存到mogilefs中level1去', function(err, bytes_written) {
             if (err) {
                 console.log(err);
                 test.ok(false);

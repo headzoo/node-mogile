@@ -1,0 +1,9 @@
+# Can ignore specific files
+.idea
+node_modules
+
+# Use wildcards as well
+*~
+*.swp
+*.iml
+*.log
