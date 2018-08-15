@@ -307,7 +307,7 @@ Mogile.prototype.sendCommand = function(cmd, callback)
 				});
 			});
 		});
-	}
+	};
 	
 	sendf();
 	return true;
