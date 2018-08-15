@@ -1,5 +1,5 @@
 {  
-	"name" : "mogile",
+    "name" : "mogile",
     "version" : "0.2.2",
     "description" : "MogileFS client library",
     "author": "Sean Hickey <sean@headzoo.io>",
