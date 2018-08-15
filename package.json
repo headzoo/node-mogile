@@ -1,7 +1,7 @@
-{  
-    "name" : "node-mogile",
-    "version" : "0.2.2",
-    "description" : "MogileFS client library",
+{
+    "name": "node-mogile",
+    "version": "0.2.3",
+    "description": "MogileFS client library",
     "author": "Sean Hickey <sean@headzoo.io>",
     "main": "./index.js",
     "repository": {
