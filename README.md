@@ -3,15 +3,15 @@ mogile - A MogileFS client for node.js
 
 This is a simple MogileFS client for node.js. This is my first real project using
 node.js, so it may be buggy, inefficient, and just plain useless. It was written to
-serve my needs, and it does.
+serve my needs.
 
 ## Installation
 
-	npm install mogile
+	npm install node-mogile
 
 ## Usage
 
-	var mogile = require('mogile');
+	var mogile = require('node-mogile');
 	
 	// The createClient method takes an array of trackers
 	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
@@ -84,7 +84,7 @@ serve my needs, and it does.
 
 ## Using Transactions
 
-	var mogile = require('mogile');
+	var mogile = require('node-mogile');
 	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
 	var client = mogile.createClient(trackers);
 	
@@ -126,7 +126,7 @@ serve my needs, and it does.
 
 (The MIT License)
 
-Copyright (c) 2011 Sean Hickey <headz@headzoo.org>
+Copyright (c) 2011 Sean Hickey <sean@headzoo.io>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
